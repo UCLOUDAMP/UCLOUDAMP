@@ -227,12 +227,11 @@ def render_markdown(content: str) -> str:
             close_list()
             continue
 
-        if line.startswith("### "):
+        heading_match = re.match(r"^(#{2,6})\s+(.+)$", line)
+        if heading_match:
             close_list()
-            rendered.append(f"<h3>{render_inline(line[4:])}</h3>")
-        elif line.startswith("## "):
-            close_list()
-            rendered.append(f"<h2>{render_inline(line[3:])}</h2>")
+            level = len(heading_match.group(1))
+            rendered.append(f"<h{level}>{render_inline(heading_match.group(2))}</h{level}>")
         elif line.startswith("- "):
             if not in_list:
                 rendered.append("<ul>")
@@ -301,7 +300,7 @@ def write_manifest(output_dir: Path) -> None:
     manifest_path = output_dir / "manifest-sha256.txt"
     records: list[tuple[str, str]] = []
 
-    for file_path in sorted(output_dir.rglob("*")):
+    for file_path in sorted(output_dir.rglob("*"), key=lambda path: path.as_posix()):
         if not file_path.is_file():
             continue
         if file_path == manifest_path:
@@ -323,23 +322,26 @@ def build(source_path: Path, output_dir: Path) -> None:
 
     html_output = render_page(metadata, sections, repo_root)
 
-    prepare_output_dir(output_dir)
-
-    (output_dir / "index.html").write_text(html_output.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
-
     css_source = repo_root / "templates" / "style.css"
     if not css_source.is_file():
         raise BuildError(f"Stylesheet template missing: {css_source}")
-    shutil.copyfile(css_source, output_dir / "style.css")
 
     assets_source = repo_root / "assets"
     if not assets_source.is_dir():
         raise BuildError(f"Assets directory missing: {assets_source}")
-    shutil.copytree(assets_source, output_dir / "assets", dirs_exist_ok=True)
 
     static_config = repo_root / "staticwebapp.config.json"
     if not static_config.is_file():
         raise BuildError(f"Missing staticwebapp.config.json at {static_config}")
+
+    prepare_output_dir(output_dir)
+
+    (output_dir / "index.html").write_text(html_output.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
+
+    shutil.copyfile(css_source, output_dir / "style.css")
+
+    shutil.copytree(assets_source, output_dir / "assets", dirs_exist_ok=True)
+
     shutil.copyfile(static_config, output_dir / "staticwebapp.config.json")
 
     write_manifest(output_dir)
