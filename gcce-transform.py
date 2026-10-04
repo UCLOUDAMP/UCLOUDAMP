@@ -201,8 +201,10 @@ def render_inline(text: str) -> str:
         label = html.escape(match.group(1), quote=True)
         raw_href = match.group(2).strip()
         if raw_href.startswith("assets/"):
+            # Local asset path validity is checked during validate_master.
             pass
         elif raw_href.startswith("#"):
+            # Anchor validity is checked during validate_master.
             pass
         else:
             ensure_safe_url(raw_href, "rendered markdown link")
@@ -272,19 +274,22 @@ def render_page(metadata: dict, sections: list[dict[str, str]], repo_root: Path)
     )
 
     template = Template(template_path.read_text(encoding="utf-8"))
-
-    return template.substitute(
-        page_title=html.escape(str(metadata["site_title"]), quote=True),
-        meta_description=html.escape(str(metadata["meta_description"]), quote=True),
-        brand=html.escape(str(metadata["brand"]), quote=True),
-        tagline=html.escape(str(metadata["tagline"]), quote=True),
-        nav_items=nav_items,
-        sections_html=sections_html,
-        footer_text=html.escape(
+    substitutions = {
+        "page_title": html.escape(str(metadata["site_title"]), quote=True),
+        "meta_description": html.escape(str(metadata["meta_description"]), quote=True),
+        "brand": html.escape(str(metadata["brand"]), quote=True),
+        "tagline": html.escape(str(metadata["tagline"]), quote=True),
+        "nav_items": nav_items,
+        "sections_html": sections_html,
+        "footer_text": html.escape(
             f"{metadata['legal_name']} · {metadata['location']} · Domain reference: {metadata['domain']}",
             quote=True,
         ),
-    )
+    }
+    try:
+        return template.substitute(substitutions)
+    except (KeyError, ValueError) as exc:
+        raise BuildError(f"Template rendering failed: {exc}") from exc
 
 
 def prepare_output_dir(output_dir: Path) -> None:
