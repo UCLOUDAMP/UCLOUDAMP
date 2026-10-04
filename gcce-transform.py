@@ -200,13 +200,7 @@ def render_inline(text: str) -> str:
         chunks.append(html.escape(text[cursor : match.start()], quote=False))
         label = html.escape(match.group(1), quote=False)
         raw_href = match.group(2).strip()
-        if raw_href.startswith("assets/"):
-            # Local asset path validity is checked during validate_master.
-            pass
-        elif raw_href.startswith("#"):
-            # Anchor validity is checked during validate_master.
-            pass
-        else:
+        if not raw_href.startswith("assets/") and not raw_href.startswith("#"):
             ensure_safe_url(raw_href, "rendered markdown link")
         href = html.escape(raw_href, quote=True)
         chunks.append(f'<a href="{href}">{label}</a>')
@@ -331,7 +325,7 @@ def build(source_path: Path, output_dir: Path) -> None:
 
     prepare_output_dir(output_dir)
 
-    (output_dir / "index.html").write_text(html_output + "\n", encoding="utf-8", newline="\n")
+    (output_dir / "index.html").write_text(html_output.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
 
     css_source = repo_root / "templates" / "style.css"
     if not css_source.is_file():

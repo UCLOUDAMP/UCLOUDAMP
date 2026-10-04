@@ -7,6 +7,7 @@
   --accent: #4ea1ff;
   --focus: #f2cc60;
   --border: #30363d;
+  --surface-hover: #1f2937;
 }
 
 * {
@@ -101,7 +102,7 @@ main,
 }
 
 .site-nav a:hover {
-  background: #1f2937;
+  background: var(--surface-hover);
 }
 
 .section {
