@@ -8,9 +8,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = REPO_ROOT / "gcce-transform.py"
 
 spec = importlib.util.spec_from_file_location("gcce_transform", MODULE_PATH)
-assert spec is not None
+if spec is None:
+    raise RuntimeError(f"Unable to create import spec for {MODULE_PATH}")
 module = importlib.util.module_from_spec(spec)
-assert spec.loader is not None
+if spec.loader is None:
+    raise RuntimeError(f"Unable to load module from {MODULE_PATH}")
 spec.loader.exec_module(module)
 
 

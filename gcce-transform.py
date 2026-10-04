@@ -197,8 +197,8 @@ def render_inline(text: str) -> str:
     chunks: list[str] = []
     cursor = 0
     for match in LINK_PATTERN.finditer(text):
-        chunks.append(html.escape(text[cursor : match.start()], quote=True))
-        label = html.escape(match.group(1), quote=True)
+        chunks.append(html.escape(text[cursor : match.start()], quote=False))
+        label = html.escape(match.group(1), quote=False)
         raw_href = match.group(2).strip()
         if raw_href.startswith("assets/"):
             # Local asset path validity is checked during validate_master.
@@ -211,7 +211,7 @@ def render_inline(text: str) -> str:
         href = html.escape(raw_href, quote=True)
         chunks.append(f'<a href="{href}">{label}</a>')
         cursor = match.end()
-    chunks.append(html.escape(text[cursor:], quote=True))
+    chunks.append(html.escape(text[cursor:], quote=False))
     return "".join(chunks)
 
 
@@ -283,7 +283,7 @@ def render_page(metadata: dict, sections: list[dict[str, str]], repo_root: Path)
         "sections_html": sections_html,
         "footer_text": html.escape(
             f"{metadata['legal_name']} · {metadata['location']} · Domain reference: {metadata['domain']}",
-            quote=True,
+            quote=False,
         ),
     }
     try:
