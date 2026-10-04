@@ -1,0 +1,151 @@
+:root {
+  color-scheme: dark;
+  --bg: #0d1117;
+  --surface: #161b22;
+  --text: #e6edf3;
+  --muted: #9da7b3;
+  --accent: #4ea1ff;
+  --focus: #f2cc60;
+  --border: #30363d;
+  --surface-hover: #1f2937;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: linear-gradient(180deg, #0d1117 0%, #0f1520 100%);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--focus);
+  color: #111;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.skip-link:focus {
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 1000;
+}
+
+a {
+  color: var(--accent);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.site-header,
+main,
+.site-footer {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  background: color-mix(in oklab, var(--surface) 88%, black 12%);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-mark {
+  border-radius: 0.4rem;
+}
+
+.brand-name {
+  margin: 0;
+  font-weight: 700;
+}
+
+.brand-tagline {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.site-nav {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.site-nav a {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.35rem;
+}
+
+.site-nav a:hover {
+  background: var(--surface-hover);
+}
+
+.section {
+  background: color-mix(in oklab, var(--surface) 95%, black 5%);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+.section h2,
+.section h3 {
+  line-height: 1.2;
+}
+
+.section ul {
+  padding-left: 1.25rem;
+}
+
+.site-footer {
+  color: var(--muted);
+  font-size: 0.92rem;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 48rem) {
+  .site-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .site-nav {
+    margin-top: 0;
+    justify-content: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
