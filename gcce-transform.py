@@ -19,6 +19,7 @@ SECTION_MARKER_PATTERN = re.compile(r"^<!-- §section:\s*([A-Z]+)\s*\|\s*id:\s*(
 FRONTMATTER_PATTERN = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 RAW_HTML_PATTERN = re.compile(r"<\s*/?\s*[A-Za-z][^>]*>")
 LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+HEADING_PATTERN = re.compile(r"^(#{2,6})\s+(.+)$")
 
 SUPPORTED_THEMES = {"dark"}
 
@@ -227,7 +228,7 @@ def render_markdown(content: str) -> str:
             close_list()
             continue
 
-        heading_match = re.match(r"^(#{2,6})\s+(.+)$", line)
+        heading_match = HEADING_PATTERN.match(line)
         if heading_match:
             close_list()
             level = len(heading_match.group(1))
@@ -252,7 +253,7 @@ def render_page(metadata: dict, sections: list[dict[str, str]], repo_root: Path)
 
     nav_items = "\n".join(
         f'          <li><a href="#{html.escape(str(item["id"]), quote=True)}">'
-        f'{html.escape(str(item["label"]), quote=True)}</a></li>'
+        f'{html.escape(str(item["label"]), quote=False)}</a></li>'
         for item in metadata["navigation"]
     )
 
