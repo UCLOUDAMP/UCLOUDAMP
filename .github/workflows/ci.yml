@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+
+      - name: Validate source
+        run: python3 gcce-transform.py --validate-only
+
+      - name: Run tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Build dist
+        run: python3 gcce-transform.py --source master.md --dist dist
+
+      - name: Repeat-build digest comparison
+        run: |
+          tmp_a="$(mktemp -d)"
+          tmp_b="$(mktemp -d)"
+          python3 gcce-transform.py --source master.md --dist "$tmp_a/dist"
+          python3 gcce-transform.py --source master.md --dist "$tmp_b/dist"
+          diff -u "$tmp_a/dist/manifest-sha256.txt" "$tmp_b/dist/manifest-sha256.txt"
