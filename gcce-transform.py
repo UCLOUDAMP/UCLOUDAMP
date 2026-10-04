@@ -294,7 +294,7 @@ def render_page(metadata: dict, sections: list[dict[str, str]], repo_root: Path)
 
 def prepare_output_dir(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    for child in output_dir.iterdir():
+    for child in list(output_dir.iterdir()):
         if child.is_symlink():
             child.unlink()
         elif child.is_dir():
