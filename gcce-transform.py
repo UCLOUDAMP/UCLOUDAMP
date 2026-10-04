@@ -199,7 +199,14 @@ def render_inline(text: str) -> str:
     for match in LINK_PATTERN.finditer(text):
         chunks.append(html.escape(text[cursor : match.start()], quote=True))
         label = html.escape(match.group(1), quote=True)
-        href = html.escape(match.group(2).strip(), quote=True)
+        raw_href = match.group(2).strip()
+        if raw_href.startswith("assets/"):
+            pass
+        elif raw_href.startswith("#"):
+            pass
+        else:
+            ensure_safe_url(raw_href, "rendered markdown link")
+        href = html.escape(raw_href, quote=True)
         chunks.append(f'<a href="{href}">{label}</a>')
         cursor = match.end()
     chunks.append(html.escape(text[cursor:], quote=True))
@@ -283,7 +290,9 @@ def render_page(metadata: dict, sections: list[dict[str, str]], repo_root: Path)
 def prepare_output_dir(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     for child in output_dir.iterdir():
-        if child.is_dir():
+        if child.is_symlink():
+            child.unlink()
+        elif child.is_dir():
             shutil.rmtree(child)
         else:
             child.unlink()
