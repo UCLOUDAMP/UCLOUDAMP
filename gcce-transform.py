@@ -50,7 +50,7 @@ def parse_sections(body: str) -> list[dict[str, str]]:
     buffer: list[str] = []
 
     for line_number, raw_line in enumerate(body.splitlines(), start=1):
-        line = raw_line.rstrip("\n")
+        line = raw_line
 
         if "§section" in line:
             marker_match = SECTION_MARKER_PATTERN.match(line)
